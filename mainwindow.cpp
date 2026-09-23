@@ -57,7 +57,7 @@ void MainWindow::initializeVisualization()
 
 
 
-    QString filePath = ":/data/trackingData_20260505_165740.txt";
+    QString filePath = ":/trackingData.txt";
 
     if (m_reader.loadTrackingData(filePath)) {
         const auto& frames = m_reader.getBodyFrames();
