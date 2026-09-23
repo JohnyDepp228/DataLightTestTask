@@ -20,11 +20,11 @@ public:
     ~MainWindow() override;
 private:
     Ui::MainWindow *ui;
-    SensorDataReader m_reader;                 // Наш парсер данных
-    QtDataVisualization::Q3DScatter *m_scatterGraph;                // Сам 3D-график
-    QWidget *m_containerWidget;                // Виджет-контейнер для встраивания в окно
+    SensorDataReader m_reader;
+    QtDataVisualization::Q3DScatter *m_scatterGraph;
+    QWidget *m_containerWidget;
     void initializeVisualization();
-    void setup3DGraph();                       // Метод настройки графика
+    void setup3DGraph();
     void displayHeadTrajectory();
 };
 #endif // MAINWINDOW_H
