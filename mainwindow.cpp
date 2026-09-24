@@ -10,21 +10,19 @@
 
 
 
+
 using namespace QtDataVisualization;
 
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QString filePath,QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
 
-    if (ui->centralwidget->layout() == nullptr) {
-        new QVBoxLayout(ui->centralwidget);
-    }
-
-    QTimer::singleShot(100, this, &MainWindow::initializeVisualization);
+    this->filePath = filePath;
+    Output();
 }
 
 void MainWindow::initializeVisualization()
@@ -42,7 +40,7 @@ void MainWindow::initializeVisualization()
 
 
     theme->setGridLineColor(QColor(80, 80, 80));
-    theme->setLabelTextColor(Qt::black);
+    theme->setLabelTextColor(Qt::gray);
 
     m_scatterGraph->axisX()->setRange(-2.0f, 2.0f);
     m_scatterGraph->axisY()->setRange(-2.0f, 2.0f);
@@ -54,10 +52,6 @@ void MainWindow::initializeVisualization()
 
 
     ui->centralwidget->layout()->addWidget(m_containerWidget);
-
-
-
-    QString filePath = ":/trackingData.txt";
 
     if (m_reader.loadTrackingData(filePath)) {
         const auto& frames = m_reader.getBodyFrames();
@@ -164,7 +158,39 @@ void MainWindow::displayHeadTrajectory()
 
 }
 
+void MainWindow::Output()
+{
+    ui->lineEdit->hide();
+    ui->label->hide();
+    ui->pushButton->hide();
+    if (ui->centralwidget->layout() == nullptr) {
+        new QVBoxLayout(ui->centralwidget);
+    }
+    QTimer::singleShot(100, this, &MainWindow::initializeVisualization);
+
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    Output();
+    QMediaPlayer* player = new QMediaPlayer(this);
+    QVideoWidget* videoWidget = new QVideoWidget(this);
+
+    videoWidget->setSizeIncrement(ui->centralwidget->width(),ui->centralwidget->height());
+
+    player->setVideoOutput(videoWidget);
+    filePath = ui->lineEdit->text();
+    if(filePath.size() != 0){
+        Output();
+
+        ui->centralwidget->layout()->addWidget(videoWidget);
+        player->setMedia(QUrl::fromLocalFile("C:/Users/LordMegatron/Desktop/testTask/testTask/CameraRecord_20260505_165740.mp4"));
+        player->play();
+    }
+}
+

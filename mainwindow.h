@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QtDataVisualization/q3dscatter.h>
+#include <QtMultimedia/QMediaPlayer>
+#include <QtMultimediaWidgets/QVideoWidget>
 #include "SensorDataReader.h"
 
 QT_BEGIN_NAMESPACE
@@ -16,8 +18,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QString filePath,QWidget *parent = nullptr);
     ~MainWindow() override;
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     SensorDataReader m_reader;
@@ -26,5 +31,10 @@ private:
     void initializeVisualization();
     void setup3DGraph();
     void displayHeadTrajectory();
+    void Output();
+    QString filePath;
+
+
+
 };
 #endif // MAINWINDOW_H

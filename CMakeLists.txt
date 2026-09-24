@@ -9,11 +9,11 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Ищем компоненты Widgets и DataVisualization для 3D
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets DataVisualization)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets DataVisualization)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Multimedia MultimediaWidgets REQUIRED)
 
-# Добавляем все исходники в общий список
+
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -24,7 +24,7 @@ set(PROJECT_SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    # Для Qt6 убираем MANUAL_FINALIZATION (он часто ломает статик-сборки, если не вызван вручную правильно)
+
     qt_add_executable(testTask
         ${PROJECT_SOURCES}
     )
@@ -33,14 +33,16 @@ else()
         add_library(testTask SHARED ${PROJECT_SOURCES})
     else()
         add_executable(testTask ${PROJECT_SOURCES}
-            sensorData.qrc)
+        )
     endif()
 endif()
 
-# Линкуем библиотеки (добавлен модуль 3D графики DataVisualization)
+
 target_link_libraries(testTask PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::DataVisualization
+    Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::MultimediaWidgets
 )
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
