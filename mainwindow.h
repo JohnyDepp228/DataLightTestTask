@@ -20,8 +20,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QString filePath,QWidget *parent = nullptr);
     ~MainWindow() override;
-private slots:
-    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -29,7 +27,6 @@ private:
     QtDataVisualization::Q3DScatter *m_scatterGraph;
     QWidget *m_containerWidget;
     void initializeVisualization();
-    void setup3DGraph();
     void displayHeadTrajectory();
     void Output();
     QString filePath;

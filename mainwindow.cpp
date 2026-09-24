@@ -7,6 +7,7 @@
 #include <QLayout>
 #include <QVBoxLayout>
 #include <QTimer>
+#include <QSpacerItem>
 
 
 
@@ -31,27 +32,51 @@ void MainWindow::initializeVisualization()
     m_scatterGraph = new Q3DScatter();
     m_containerWidget = QWidget::createWindowContainer(m_scatterGraph);
 
+
+    m_scatterGraph->axisX()->setTitleVisible(false);
+    m_scatterGraph->axisY()->setTitleVisible(false);
+    m_scatterGraph->axisZ()->setTitleVisible(false);
+
+
     Q3DTheme *theme = m_scatterGraph->activeTheme();
     theme->setType(Q3DTheme::ThemeEbony);
 
 
-    theme->setBackgroundColor(QColor(40, 40, 40));
-    theme->setWindowColor(QColor(40, 40, 40));
+    theme->setBackgroundEnabled(false);
+    theme->setGridEnabled(false);
+    theme->setLabelBackgroundEnabled(false);
 
+    QFont hiddenFont = theme->font();
+    hiddenFont.setPointSize(0);
+    theme->setFont(hiddenFont);
+    theme->setLabelTextColor(QColor(0, 0, 0, 0));
 
-    theme->setGridLineColor(QColor(80, 80, 80));
-    theme->setLabelTextColor(Qt::gray);
+    theme->setGridLineColor(QColor(0, 0, 0, 0));
+    theme->setGridLineColor(QColor(0, 0, 0, 0));
+
+    theme->setBackgroundColor(QColor(0, 0, 0));
+    theme->setWindowColor(QColor(0, 0, 0));
+
 
     m_scatterGraph->axisX()->setRange(-2.0f, 2.0f);
     m_scatterGraph->axisY()->setRange(-2.0f, 2.0f);
     m_scatterGraph->axisZ()->setRange(-2.0f, 2.0f);
 
-    m_scatterGraph->axisX()->setTitle("X (Влево/Вправо)");
-    m_scatterGraph->axisY()->setTitle("Y (Высота)");
-    m_scatterGraph->axisZ()->setTitle("Z (Вперед/Назад)");
-
-
     ui->centralwidget->layout()->addWidget(m_containerWidget);
+    QScatter3DSeries *roomFloorSeries = new QScatter3DSeries();
+    QScatterDataArray *floorData = new QScatterDataArray;
+
+    float floorY = -1.8f;
+    for (float x = -2.0f; x <= 2.0f; x += 0.15f) {
+        for (float z = -2.0f; z <= 2.0f; z += 0.15f) {
+            floorData->append(QScatterDataItem(QVector3D(x, floorY, z)));
+        }
+    }
+    roomFloorSeries->dataProxy()->resetArray(floorData);
+    roomFloorSeries->setMesh(QAbstract3DSeries::MeshBar);
+    roomFloorSeries->setItemSize(0.3f);
+    roomFloorSeries->setBaseColor(QColor(80, 80, 80));
+    m_scatterGraph->addSeries(roomFloorSeries);
 
     if (m_reader.loadTrackingData(filePath)) {
         const auto& frames = m_reader.getBodyFrames();
@@ -99,33 +124,11 @@ void MainWindow::initializeVisualization()
         });
 
 
-        playbackTimer->start(15);
+        playbackTimer->start(10);
     }
 }
 
-void MainWindow::setup3DGraph()
-{
-    m_scatterGraph = new Q3DScatter();
 
-
-    m_containerWidget = QWidget::createWindowContainer(m_scatterGraph);
-
-
-    m_scatterGraph->axisX()->setTitle("Ось X (Метры)");
-    m_scatterGraph->axisY()->setTitle("Ось Y (Вертикаль)");
-    m_scatterGraph->axisZ()->setTitle("Ось Z (Метры)");
-
-
-    m_scatterGraph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
-    m_scatterGraph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFrontHigh);
-
-
-    if (ui->centralwidget->layout() == nullptr) {
-        QVBoxLayout *layout = new QVBoxLayout(ui->centralwidget);
-        ui->centralwidget->setLayout(layout);
-    }
-    ui->centralwidget->layout()->addWidget(m_containerWidget);
-}
 
 void MainWindow::displayHeadTrajectory()
 {
@@ -160,37 +163,15 @@ void MainWindow::displayHeadTrajectory()
 
 void MainWindow::Output()
 {
-    ui->lineEdit->hide();
-    ui->label->hide();
-    ui->pushButton->hide();
     if (ui->centralwidget->layout() == nullptr) {
         new QVBoxLayout(ui->centralwidget);
     }
-    QTimer::singleShot(100, this, &MainWindow::initializeVisualization);
+    QTimer::singleShot(50, this, &MainWindow::initializeVisualization);
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    Output();
-    QMediaPlayer* player = new QMediaPlayer(this);
-    QVideoWidget* videoWidget = new QVideoWidget(this);
-
-    videoWidget->setSizeIncrement(ui->centralwidget->width(),ui->centralwidget->height());
-
-    player->setVideoOutput(videoWidget);
-    filePath = ui->lineEdit->text();
-    if(filePath.size() != 0){
-        Output();
-
-        ui->centralwidget->layout()->addWidget(videoWidget);
-        player->setMedia(QUrl::fromLocalFile("C:/Users/LordMegatron/Desktop/testTask/testTask/CameraRecord_20260505_165740.mp4"));
-        player->play();
-    }
 }
 
